@@ -419,22 +419,43 @@ with tab2:
 
     st.markdown("---")
 
-    # --- C. Recherche de comparables ---
+    # --- C. Recherche de comparables (élargissement automatique) ---
     st.subheader("⚖️ Propriétés comparables")
 
-    sqft_low = prop["sqft_living"] * 0.8
-    sqft_high = prop["sqft_living"] * 1.2
-
-    comps = df[
-        (df["zipcode"] == prop["zipcode"])
-        & (df["bedrooms"] == prop["bedrooms"])
-        & (df["sqft_living"].between(sqft_low, sqft_high))
-        & (df.index != selected_idx)
+    # Niveaux de recherche : on élargit progressivement si pas assez de résultats
+    search_levels = [
+        {"label": "Strict (même zip, même chambres, ±20% sup.)", "zip_same": True, "bed_tol": 0, "sqft_tol": 0.20},
+        {"label": "Élargi (même zip, chambres ±1, ±30% sup.)", "zip_same": True, "bed_tol": 1, "sqft_tol": 0.30},
+        {"label": "Large (même zip, chambres ±2, ±50% sup.)", "zip_same": True, "bed_tol": 2, "sqft_tol": 0.50},
+        {"label": "Très large (tous zips, chambres ±1, ±30% sup.)", "zip_same": False, "bed_tol": 1, "sqft_tol": 0.30},
     ]
 
+    comps = pd.DataFrame()
+    used_level = None
+    for level in search_levels:
+        sqft_low = prop["sqft_living"] * (1 - level["sqft_tol"])
+        sqft_high = prop["sqft_living"] * (1 + level["sqft_tol"])
+        bed_low = prop["bedrooms"] - level["bed_tol"]
+        bed_high = prop["bedrooms"] + level["bed_tol"]
+
+        mask = (
+            (df["bedrooms"].between(bed_low, bed_high))
+            & (df["sqft_living"].between(sqft_low, sqft_high))
+            & (df.index != selected_idx)
+        )
+        if level["zip_same"]:
+            mask = mask & (df["zipcode"] == prop["zipcode"])
+
+        comps = df[mask]
+        if len(comps) >= 3:
+            used_level = level
+            break
+
     if len(comps) == 0:
-        st.info("Aucun comparable trouvé avec ces critères.")
+        st.info("Aucun comparable trouvé, même avec des critères élargis.")
     else:
+        if used_level and used_level != search_levels[0]:
+            st.caption(f"🔄 Critères élargis automatiquement : {used_level['label']}")
         comps_display = comps.head(10)
         n_comps = len(comps)
         mean_comp_price = comps["price"].mean()
