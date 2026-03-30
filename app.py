@@ -212,25 +212,23 @@ hr {
 }
 
 /* ── Expander ── */
-.streamlit-expanderHeader,
-[data-testid="stExpander"] summary,
-[data-testid="stExpander"] summary span,
-[data-testid="stExpander"] summary p {
-    background: #1e293b !important;
-    border-radius: 12px !important;
-    border: 1px solid #334155 !important;
-    color: #e2e8f0 !important;
-    font-weight: 600 !important;
-    font-size: 1rem !important;
-}
-[data-testid="stExpander"] summary svg {
-    color: #818cf8 !important;
-    stroke: #818cf8 !important;
-}
 [data-testid="stExpander"] details {
     border: 1px solid #334155 !important;
     border-radius: 12px !important;
     background: #1e293b !important;
+}
+[data-testid="stExpander"] summary {
+    color: #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+[data-testid="stExpander"] summary span,
+[data-testid="stExpander"] summary p {
+    color: #e2e8f0 !important;
+    background: none !important;
+    border: none !important;
+}
+[data-testid="stExpander"] summary svg {
+    color: #818cf8 !important;
 }
 [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
     background: #1e293b !important;
