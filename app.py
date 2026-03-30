@@ -212,12 +212,28 @@ hr {
 }
 
 /* ── Expander ── */
-.streamlit-expanderHeader {
+.streamlit-expanderHeader,
+[data-testid="stExpander"] summary,
+[data-testid="stExpander"] summary span,
+[data-testid="stExpander"] summary p {
     background: #1e293b !important;
     border-radius: 12px !important;
     border: 1px solid #334155 !important;
     color: #e2e8f0 !important;
     font-weight: 600 !important;
+    font-size: 1rem !important;
+}
+[data-testid="stExpander"] summary svg {
+    color: #818cf8 !important;
+    stroke: #818cf8 !important;
+}
+[data-testid="stExpander"] details {
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    background: #1e293b !important;
+}
+[data-testid="stExpander"] [data-testid="stExpanderDetails"] {
+    background: #1e293b !important;
 }
 
 /* ── Custom Cards ── */
@@ -593,7 +609,7 @@ with tab1:
         ]
         corr = filtered[corr_cols].corr()
         sns.heatmap(
-            corr, annot=True, fmt=".2f", cmap="RdYlBu_r", ax=ax3,
+            corr, annot=True, fmt=".2f", cmap="RdYlBu_r", ax=ax3, annot_kws={"size": 8, "color": "#ffffff"},
             square=True, linewidths=0.5, linecolor="#334155",
             cbar_kws={"shrink": 0.8},
         )
