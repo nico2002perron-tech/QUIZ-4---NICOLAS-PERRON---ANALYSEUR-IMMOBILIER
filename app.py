@@ -273,154 +273,62 @@ hr {
     margin-bottom: 10px;
 }
 
-/* ── Welcome Modal ── */
-.welcome-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn 0.3s ease;
+/* ── Dialog override ── */
+[data-testid="stDialog"] > div {
+    background: #1e293b !important;
+    border: 1px solid #6366f1 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 25px 60px rgba(99, 102, 241, 0.25) !important;
 }
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.welcome-modal {
-    background: linear-gradient(160deg, #1e293b, #0f172a);
-    border: 1px solid #6366f1;
-    border-radius: 24px;
-    padding: 40px 44px;
-    max-width: 640px;
-    width: 90%;
-    box-shadow: 0 25px 60px rgba(99, 102, 241, 0.25);
-    animation: slideUp 0.4s ease 0.1s both;
-    text-align: center;
-}
-.welcome-modal h2 {
-    font-family: 'Space Grotesk', sans-serif !important;
-    background: linear-gradient(135deg, #818cf8, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 1.8rem !important;
-    font-weight: 800 !important;
-    margin-bottom: 8px;
-}
-.welcome-modal .subtitle {
+[data-testid="stDialog"] [data-testid="stMarkdownContainer"] p {
     color: #94a3b8;
-    font-size: 0.95rem;
-    margin-bottom: 28px;
-}
-.welcome-modal .feature-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin: 24px 0;
-    text-align: left;
-}
-.welcome-modal .feature {
-    background: rgba(99, 102, 241, 0.06);
-    border: 1px solid rgba(99, 102, 241, 0.15);
-    border-radius: 12px;
-    padding: 14px 16px;
-}
-.welcome-modal .feature .icon {
-    font-size: 1.4rem;
-    margin-bottom: 6px;
-}
-.welcome-modal .feature .title {
-    color: #e2e8f0;
-    font-weight: 700;
-    font-size: 0.88rem;
-}
-.welcome-modal .feature .desc {
-    color: #94a3b8;
-    font-size: 0.78rem;
-    margin-top: 2px;
-}
-.welcome-modal .cta-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    color: white;
-    font-weight: 700;
-    font-size: 1rem;
-    padding: 14px 40px;
-    border-radius: 14px;
-    border: none;
-    cursor: pointer;
-    margin-top: 24px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-    text-decoration: none;
-}
-.welcome-modal .cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
-}
-.welcome-modal .tech-stack {
-    color: #64748b;
-    font-size: 0.72rem;
-    margin-top: 20px;
-    letter-spacing: 0.5px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# Welcome Popup (one-time)
+# Welcome Popup (native Streamlit dialog)
 # ---------------------------------------------------------------------------
+@st.dialog("Bienvenue sur HomeScope AI", width="large")
+def welcome_dialog():
+    st.markdown(
+        "<div style='text-align:center;'>"
+        "<span style='font-size:3.5rem;'>🏡</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        "<p style='text-align:center; color:#94a3b8; font-size:1rem; margin-bottom:20px;'>"
+        "Votre analyseur immobilier intelligent pour le comté de King (Seattle)"
+        "</p>",
+        unsafe_allow_html=True,
+    )
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**📊 Exploration du marché**")
+        st.caption("Filtrez et visualisez 21 613 propriétés avec des graphiques interactifs.")
+        st.markdown("**🤖 IA intégrée**")
+        st.caption("Résumés de marché et recommandations générés par Google Gemini.")
+    with c2:
+        st.markdown("**🔍 Analyse détaillée**")
+        st.caption("Étudiez une propriété et comparez-la à des biens similaires.")
+        st.markdown("**🗺️ Cartes interactives**")
+        st.caption("Localisez les propriétés sur la carte de Seattle.")
+
+    st.markdown("---")
+    st.markdown(
+        "<p style='text-align:center; color:#64748b; font-size:0.75rem; letter-spacing:1px;'>"
+        "STREAMLIT &bull; PANDAS &bull; MATPLOTLIB &bull; GOOGLE GEMINI &bull; PYTHON</p>",
+        unsafe_allow_html=True,
+    )
+
+    if st.button("Commencer l'exploration", use_container_width=True, type="primary"):
+        st.session_state.welcomed = True
+        st.rerun()
+
 if "welcomed" not in st.session_state:
-    st.session_state.welcomed = False
-
-if not st.session_state.welcomed:
-    st.markdown("""
-    <div class="welcome-overlay" id="welcomeOverlay">
-        <div class="welcome-modal">
-            <div style="font-size:3rem; margin-bottom:10px;">🏡</div>
-            <h2>Bienvenue sur HomeScope AI</h2>
-            <p class="subtitle">Votre analyseur immobilier intelligent pour le comté de King (Seattle)</p>
-
-            <div class="feature-grid">
-                <div class="feature">
-                    <div class="icon">📊</div>
-                    <div class="title">Exploration du marché</div>
-                    <div class="desc">Filtrez et visualisez 21 613 propriétés avec des graphiques interactifs</div>
-                </div>
-                <div class="feature">
-                    <div class="icon">🔍</div>
-                    <div class="title">Analyse détaillée</div>
-                    <div class="desc">Étudiez une propriété et comparez-la à des biens similaires</div>
-                </div>
-                <div class="feature">
-                    <div class="icon">🤖</div>
-                    <div class="title">IA intégrée</div>
-                    <div class="desc">Résumés de marché et recommandations générés par Google Gemini</div>
-                </div>
-                <div class="feature">
-                    <div class="icon">🗺️</div>
-                    <div class="title">Cartes interactives</div>
-                    <div class="desc">Localisez les propriétés sur la carte de Seattle</div>
-                </div>
-            </div>
-
-            <button class="cta-btn" onclick="
-                document.getElementById('welcomeOverlay').style.opacity='0';
-                setTimeout(function(){document.getElementById('welcomeOverlay').style.display='none';},300);
-            ">Commencer l'exploration</button>
-
-            <div class="tech-stack">STREAMLIT  •  PANDAS  •  MATPLOTLIB  •  GOOGLE GEMINI  •  PYTHON</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.session_state.welcomed = True
+    welcome_dialog()
 
 # ---------------------------------------------------------------------------
 # Header
