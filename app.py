@@ -240,6 +240,20 @@ hr {
     color: #818cf8 !important;
     fill: #818cf8 !important;
 }
+[data-testid="stExpander"] summary [data-testid="stIconMaterial"] {
+    font-size: 0 !important;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+}
+[data-testid="stExpander"] summary [data-testid="stIconMaterial"]::before {
+    content: "▶";
+    font-size: 14px;
+    color: #818cf8;
+}
+details[open] > summary [data-testid="stIconMaterial"]::before {
+    content: "▼";
+}
 [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
     background: #1e293b !important;
 }
