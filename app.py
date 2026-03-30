@@ -34,6 +34,16 @@ st.markdown("""
 *, *::before, *::after { font-family: 'Inter', sans-serif !important; }
 h1, h2, h3, .logo-text { font-family: 'Space Grotesk', sans-serif !important; }
 
+/* ── Material Icons fix — ne pas écraser la police des icônes ── */
+[data-testid="stIconMaterial"],
+.material-symbols-rounded,
+.material-icons {
+    font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+    font-size: 24px !important;
+    -webkit-font-feature-settings: 'liga' !important;
+    font-feature-settings: 'liga' !important;
+}
+
 .stApp {
     background: #0f172a;
 }
@@ -241,18 +251,7 @@ hr {
     fill: #818cf8 !important;
 }
 [data-testid="stExpander"] summary [data-testid="stIconMaterial"] {
-    font-size: 0 !important;
-    width: 24px;
-    height: 24px;
-    overflow: hidden;
-}
-[data-testid="stExpander"] summary [data-testid="stIconMaterial"]::before {
-    content: "▶";
-    font-size: 14px;
-    color: #818cf8;
-}
-details[open] > summary [data-testid="stIconMaterial"]::before {
-    content: "▼";
+    color: #818cf8 !important;
 }
 [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
     background: #1e293b !important;
