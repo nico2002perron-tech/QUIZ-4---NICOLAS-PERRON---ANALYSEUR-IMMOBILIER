@@ -150,7 +150,30 @@ h3 {
     font-size: 1rem !important;
 }
 [data-testid="stSidebar"] .stCaption {
-    color: #64748b !important;
+    color: #94a3b8 !important;
+}
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] .stSlider label,
+[data-testid="stSidebar"] .stMultiSelect label,
+[data-testid="stSidebar"] .stCheckbox label,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] p {
+    color: #e2e8f0 !important;
+}
+[data-testid="stSidebar"] .stSlider [data-testid="stTickBarMin"],
+[data-testid="stSidebar"] .stSlider [data-testid="stTickBarMax"] {
+    color: #94a3b8 !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] span,
+[data-testid="stSidebar"] [data-baseweb="input"] input {
+    color: #e2e8f0 !important;
+}
+[data-testid="stSidebar"] [data-baseweb="tag"] {
+    background: #6366f1 !important;
+    color: #ffffff !important;
+}
+[data-testid="stSidebar"] hr {
+    border-color: #334155 !important;
 }
 
 /* ── Buttons ── */
