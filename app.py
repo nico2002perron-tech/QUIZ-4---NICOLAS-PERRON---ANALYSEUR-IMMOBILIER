@@ -216,19 +216,29 @@ hr {
     border: 1px solid #334155 !important;
     border-radius: 12px !important;
     background: #1e293b !important;
+    overflow: hidden;
 }
 [data-testid="stExpander"] summary {
     color: #e2e8f0 !important;
     font-weight: 600 !important;
+    background: #1e293b !important;
+    list-style: none !important;
 }
-[data-testid="stExpander"] summary span,
-[data-testid="stExpander"] summary p {
+[data-testid="stExpander"] summary::-webkit-details-marker {
+    display: none !important;
+}
+[data-testid="stExpander"] summary::marker {
+    content: "" !important;
+    display: none !important;
+}
+[data-testid="stExpander"] summary * {
     color: #e2e8f0 !important;
     background: none !important;
     border: none !important;
 }
 [data-testid="stExpander"] summary svg {
     color: #818cf8 !important;
+    fill: #818cf8 !important;
 }
 [data-testid="stExpander"] [data-testid="stExpanderDetails"] {
     background: #1e293b !important;
