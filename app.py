@@ -12,7 +12,8 @@ from google import genai
 # Configuration
 # ---------------------------------------------------------------------------
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+api_key = os.getenv("GOOGLE_API_KEY") or st.secrets.get("GOOGLE_API_KEY")
+client = genai.Client(api_key=api_key)
 LLM_MODEL = "gemini-3.1-flash-lite-preview"
 
 st.set_page_config(page_title="Analyseur Immobilier - King County", layout="wide")
