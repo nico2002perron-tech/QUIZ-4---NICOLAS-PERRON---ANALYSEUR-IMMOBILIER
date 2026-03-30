@@ -17,7 +17,7 @@ client = genai.Client(api_key=api_key)
 LLM_MODEL = "gemini-3.1-flash-lite-preview"
 
 st.set_page_config(
-    page_title="HomeScope AI | King County",
+    page_title="Analyseur Immobilier | King County",
     page_icon="🏡",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -349,7 +349,7 @@ hr {
 # ---------------------------------------------------------------------------
 # Welcome Popup (native Streamlit dialog)
 # ---------------------------------------------------------------------------
-@st.dialog("Bienvenue sur HomeScope AI", width="large")
+@st.dialog("Bienvenue sur l'Analyseur Immobilier", width="large")
 def welcome_dialog():
     st.markdown(
         "<div style='text-align:center;'>"
@@ -393,7 +393,7 @@ if "welcomed" not in st.session_state:
 # ---------------------------------------------------------------------------
 # Header
 # ---------------------------------------------------------------------------
-st.title("HomeScope AI")
+st.title("Analyseur Immobilier")
 st.markdown(
     "<p style='text-align:center; color:#94a3b8; margin-top:-8px; font-size:1rem; letter-spacing:0.5px;'>"
     "Analyseur immobilier intelligent &mdash; King County, Seattle"
@@ -447,7 +447,7 @@ with st.sidebar:
         "<span style='font-family:Space Grotesk,sans-serif; "
         "background:linear-gradient(135deg,#818cf8,#a78bfa); "
         "-webkit-background-clip:text; -webkit-text-fill-color:transparent; "
-        "font-weight:800; font-size:1.15rem;'>HomeScope AI</span><br>"
+        "font-weight:800; font-size:1.15rem;'>Analyseur Immobilier</span><br>"
         "<span style='color:#64748b; font-size:0.75rem; letter-spacing:1px;'>"
         "21 613 PROPRIÉTÉS &bull; SEATTLE, WA</span>"
         "</div>",
@@ -945,7 +945,7 @@ st.markdown("---")
 st.markdown(
     "<div style='text-align:center; padding:20px 0;'>"
     "<span style='font-family:Space Grotesk,sans-serif; color:#475569; font-size:0.85rem; font-weight:600;'>"
-    "HomeScope AI</span>"
+    "Analyseur Immobilier</span>"
     "<span style='color:#334155; font-size:0.85rem;'> &nbsp;|&nbsp; </span>"
     "<span style='color:#64748b; font-size:0.75rem;'>"
     "Streamlit &bull; Pandas &bull; Matplotlib &bull; Google Gemini"
