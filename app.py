@@ -17,161 +17,424 @@ client = genai.Client(api_key=api_key)
 LLM_MODEL = "gemini-3.1-flash-lite-preview"
 
 st.set_page_config(
-    page_title="Analyseur Immobilier - King County",
-    page_icon="🏠",
+    page_title="HomeScope AI | King County",
+    page_icon="🏡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # ---------------------------------------------------------------------------
-# CSS personnalisé
+# CSS — Modern tech / Duolingo-inspired
 # ---------------------------------------------------------------------------
 st.markdown("""
 <style>
-    /* ── Fond principal ── */
-    .stApp {
-        background: linear-gradient(180deg, #0a1628 0%, #111d33 100%);
-    }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
 
-    /* ── Titre principal ── */
-    h1 {
-        color: #e8c547 !important;
-        text-align: center;
-        font-size: 2.4rem !important;
-        letter-spacing: 1px;
-        border-bottom: 2px solid #1e3a5f;
-        padding-bottom: 15px;
-    }
+/* ── Reset & Base ── */
+*, *::before, *::after { font-family: 'Inter', sans-serif !important; }
+h1, h2, h3, .logo-text { font-family: 'Space Grotesk', sans-serif !important; }
 
-    /* ── Sous-titres ── */
-    h2, h3 { color: #7eb8da !important; }
+.stApp {
+    background: #0f172a;
+}
 
-    /* ── Onglets ── */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        justify-content: center;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background-color: #112240;
-        color: #8892b0;
-        border-radius: 8px 8px 0 0;
-        padding: 10px 28px;
-        font-weight: 600;
-        border: 1px solid #1e3a5f;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #1e3a5f !important;
-        color: #e8c547 !important;
-        border-bottom: 3px solid #e8c547;
-    }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
 
-    /* ── Cartes KPI ── */
-    [data-testid="stMetric"] {
-        background: linear-gradient(135deg, #112240, #1a2f4e);
-        border: 1px solid #1e3a5f;
-        border-radius: 12px;
-        padding: 16px 20px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    [data-testid="stMetricLabel"] {
-        color: #8892b0 !important;
-        font-size: 0.85rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    [data-testid="stMetricValue"] {
-        color: #e8c547 !important;
-        font-size: 1.6rem !important;
-        font-weight: 700 !important;
-    }
+/* ── Header ── */
+h1 {
+    background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    text-align: center !important;
+    font-size: 2.6rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+    border: none !important;
+    padding-bottom: 0 !important;
+}
 
-    /* ── Sidebar ── */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0d1b2a, #112240);
-        border-right: 1px solid #1e3a5f;
-    }
-    [data-testid="stSidebar"] h2 {
-        color: #e8c547 !important;
-        font-size: 1.1rem !important;
-    }
+h2 {
+    color: #e2e8f0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.3px;
+}
 
-    /* ── Boutons ── */
-    .stButton > button {
-        background: linear-gradient(135deg, #e8c547, #d4a833) !important;
-        color: #0a1628 !important;
-        font-weight: 700 !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 10px 24px !important;
-        transition: all 0.3s ease;
-    }
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(232, 197, 71, 0.3) !important;
-    }
+h3 {
+    color: #cbd5e1 !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+}
 
-    /* ── Séparateurs ── */
-    hr { border-color: #1e3a5f !important; }
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 6px;
+    justify-content: center;
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 6px;
+    border: 1px solid #334155;
+}
+.stTabs [data-baseweb="tab"] {
+    background: transparent;
+    color: #94a3b8;
+    border-radius: 12px;
+    padding: 12px 28px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    transition: all 0.2s ease;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: #c7d2fe;
+}
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+.stTabs [data-baseweb="tab-panel"] {
+    padding-top: 20px;
+}
+.stTabs [data-baseweb="tab-highlight"] {
+    display: none;
+}
+.stTabs [data-baseweb="tab-border"] {
+    display: none;
+}
 
-    /* ── Dataframes ── */
-    [data-testid="stDataFrame"] {
-        border: 1px solid #1e3a5f;
-        border-radius: 8px;
-    }
+/* ── KPI Cards ── */
+[data-testid="stMetric"] {
+    background: linear-gradient(145deg, #1e293b, #253348);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.15);
+    border-color: #6366f1;
+}
+[data-testid="stMetricLabel"] {
+    color: #94a3b8 !important;
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600 !important;
+}
+[data-testid="stMetricValue"] {
+    color: #f1f5f9 !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}
+[data-testid="stMetricDelta"] {
+    font-weight: 600 !important;
+}
 
-    /* ── Info boxes ── */
-    .info-box {
-        background: rgba(78, 195, 247, 0.08);
-        border-left: 4px solid #4fc3f7;
-        border-radius: 0 8px 8px 0;
-        padding: 12px 16px;
-        margin: 10px 0 20px 0;
-        color: #b0c4de;
-        font-size: 0.92rem;
-    }
-    .success-box {
-        background: rgba(46, 204, 113, 0.08);
-        border-left: 4px solid #2ecc71;
-        border-radius: 0 8px 8px 0;
-        padding: 12px 16px;
-        margin: 10px 0 20px 0;
-        color: #b0c4de;
-        font-size: 0.92rem;
-    }
-    .warning-box {
-        background: rgba(232, 197, 71, 0.08);
-        border-left: 4px solid #e8c547;
-        border-radius: 0 8px 8px 0;
-        padding: 12px 16px;
-        margin: 10px 0 20px 0;
-        color: #b0c4de;
-        font-size: 0.92rem;
-    }
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: #1e293b;
+    border-right: 1px solid #334155;
+}
+[data-testid="stSidebar"] h2 {
+    color: #c7d2fe !important;
+    font-size: 1rem !important;
+}
+[data-testid="stSidebar"] .stCaption {
+    color: #64748b !important;
+}
 
-    /* ── Section cards ── */
-    .section-card {
-        background: rgba(17, 34, 64, 0.6);
-        border: 1px solid #1e3a5f;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin: 15px 0;
-    }
+/* ── Buttons ── */
+.stButton > button {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 14px !important;
+    padding: 14px 28px !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.3px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+}
+.stButton > button:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5) !important;
+    background: linear-gradient(135deg, #818cf8, #a78bfa) !important;
+}
+.stButton > button:active {
+    transform: translateY(-1px) !important;
+}
+
+/* ── Dividers ── */
+hr {
+    border-color: #1e293b !important;
+    margin: 25px 0 !important;
+}
+
+/* ── Dataframes ── */
+[data-testid="stDataFrame"] {
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ── Expander ── */
+.streamlit-expanderHeader {
+    background: #1e293b !important;
+    border-radius: 12px !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+
+/* ── Custom Cards ── */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 16px;
+    padding: 22px 26px;
+    margin: 12px 0;
+}
+
+.tip-card {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 12px 0 20px 0;
+    color: #c7d2fe;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.tip-card b { color: #a5b4fc; }
+
+.success-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(16, 185, 129, 0.08));
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 12px 0 20px 0;
+    color: #86efac;
+    font-size: 0.9rem;
+}
+
+.warn-card {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.08));
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 12px 0 20px 0;
+    color: #fde68a;
+    font-size: 0.9rem;
+}
+
+.ai-response {
+    background: linear-gradient(145deg, #1e293b, #253348);
+    border: 1px solid #6366f1;
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin: 15px 0;
+    color: #e2e8f0;
+    line-height: 1.7;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+}
+.ai-response p { color: #cbd5e1; }
+
+.step-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-right: 8px;
+    letter-spacing: 0.5px;
+}
+
+.section-label {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* ── Welcome Modal ── */
+.welcome-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.welcome-modal {
+    background: linear-gradient(160deg, #1e293b, #0f172a);
+    border: 1px solid #6366f1;
+    border-radius: 24px;
+    padding: 40px 44px;
+    max-width: 640px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(99, 102, 241, 0.25);
+    animation: slideUp 0.4s ease 0.1s both;
+    text-align: center;
+}
+.welcome-modal h2 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    background: linear-gradient(135deg, #818cf8, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    margin-bottom: 8px;
+}
+.welcome-modal .subtitle {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+}
+.welcome-modal .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 24px 0;
+    text-align: left;
+}
+.welcome-modal .feature {
+    background: rgba(99, 102, 241, 0.06);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+.welcome-modal .feature .icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+}
+.welcome-modal .feature .title {
+    color: #e2e8f0;
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+.welcome-modal .feature .desc {
+    color: #94a3b8;
+    font-size: 0.78rem;
+    margin-top: 2px;
+}
+.welcome-modal .cta-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px 40px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    margin-top: 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    text-decoration: none;
+}
+.welcome-modal .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+}
+.welcome-modal .tech-stack {
+    color: #64748b;
+    font-size: 0.72rem;
+    margin-top: 20px;
+    letter-spacing: 0.5px;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# Titre + introduction
+# Welcome Popup (one-time)
 # ---------------------------------------------------------------------------
-st.title("🏠 Analyseur Immobilier — King County")
+if "welcomed" not in st.session_state:
+    st.session_state.welcomed = False
+
+if not st.session_state.welcomed:
+    st.markdown("""
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-modal">
+            <div style="font-size:3rem; margin-bottom:10px;">🏡</div>
+            <h2>Bienvenue sur HomeScope AI</h2>
+            <p class="subtitle">Votre analyseur immobilier intelligent pour le comté de King (Seattle)</p>
+
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="icon">📊</div>
+                    <div class="title">Exploration du marché</div>
+                    <div class="desc">Filtrez et visualisez 21 613 propriétés avec des graphiques interactifs</div>
+                </div>
+                <div class="feature">
+                    <div class="icon">🔍</div>
+                    <div class="title">Analyse détaillée</div>
+                    <div class="desc">Étudiez une propriété et comparez-la à des biens similaires</div>
+                </div>
+                <div class="feature">
+                    <div class="icon">🤖</div>
+                    <div class="title">IA intégrée</div>
+                    <div class="desc">Résumés de marché et recommandations générés par Google Gemini</div>
+                </div>
+                <div class="feature">
+                    <div class="icon">🗺️</div>
+                    <div class="title">Cartes interactives</div>
+                    <div class="desc">Localisez les propriétés sur la carte de Seattle</div>
+                </div>
+            </div>
+
+            <button class="cta-btn" onclick="
+                document.getElementById('welcomeOverlay').style.opacity='0';
+                setTimeout(function(){document.getElementById('welcomeOverlay').style.display='none';},300);
+            ">Commencer l'exploration</button>
+
+            <div class="tech-stack">STREAMLIT  •  PANDAS  •  MATPLOTLIB  •  GOOGLE GEMINI  •  PYTHON</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.session_state.welcomed = True
+
+# ---------------------------------------------------------------------------
+# Header
+# ---------------------------------------------------------------------------
+st.title("HomeScope AI")
 st.markdown(
-    "<p style='text-align:center; color:#8892b0; margin-top:-10px; font-size:1.05rem;'>"
-    "Explorez le marché immobilier de Seattle &bull; Analysez des propriétés &bull; Obtenez des recommandations IA"
+    "<p style='text-align:center; color:#94a3b8; margin-top:-8px; font-size:1rem; letter-spacing:0.5px;'>"
+    "Analyseur immobilier intelligent &mdash; King County, Seattle"
     "</p>",
     unsafe_allow_html=True,
 )
 
 # ---------------------------------------------------------------------------
-# Étape 0 — Chargement et préparation des données
+# Data loading
 # ---------------------------------------------------------------------------
 @st.cache_data
 def load_data():
@@ -185,108 +448,110 @@ def load_data():
 
 df = load_data()
 
-# Palette matplotlib (fond sombre)
+# Matplotlib dark theme
 plt.rcParams.update({
-    "figure.facecolor": "#112240",
-    "axes.facecolor": "#0a1628",
-    "axes.edgecolor": "#1e3a5f",
-    "axes.labelcolor": "#8892b0",
-    "xtick.color": "#8892b0",
-    "ytick.color": "#8892b0",
-    "text.color": "#ccd6f6",
-    "grid.color": "#1e3a5f",
-    "grid.alpha": 0.4,
+    "figure.facecolor": "#1e293b",
+    "axes.facecolor": "#0f172a",
+    "axes.edgecolor": "#334155",
+    "axes.labelcolor": "#94a3b8",
+    "xtick.color": "#94a3b8",
+    "ytick.color": "#94a3b8",
+    "text.color": "#e2e8f0",
+    "grid.color": "#334155",
+    "grid.alpha": 0.5,
 })
 
+# Accent colors
+C_PRIMARY = "#6366f1"    # indigo
+C_SECONDARY = "#8b5cf6"  # violet
+C_ACCENT = "#22d3ee"     # cyan
+C_SUCCESS = "#22c55e"    # green
+C_WARN = "#f59e0b"       # amber
+C_TEXT = "#e2e8f0"
+
 # ---------------------------------------------------------------------------
-# Sidebar — À propos
+# Sidebar
 # ---------------------------------------------------------------------------
 with st.sidebar:
     st.markdown(
-        "<div style='text-align:center; padding:10px 0 5px 0;'>"
-        "<span style='font-size:2rem;'>🏠</span><br>"
-        "<span style='color:#e8c547; font-weight:700; font-size:1rem;'>King County Analyzer</span><br>"
-        "<span style='color:#8892b0; font-size:0.78rem;'>21 613 propriétés &bull; Seattle, WA</span>"
+        "<div style='text-align:center; padding:15px 0 8px 0;'>"
+        "<span style='font-size:2.2rem;'>🏡</span><br>"
+        "<span style='font-family:Space Grotesk,sans-serif; "
+        "background:linear-gradient(135deg,#818cf8,#a78bfa); "
+        "-webkit-background-clip:text; -webkit-text-fill-color:transparent; "
+        "font-weight:800; font-size:1.15rem;'>HomeScope AI</span><br>"
+        "<span style='color:#64748b; font-size:0.75rem; letter-spacing:1px;'>"
+        "21 613 PROPRIÉTÉS &bull; SEATTLE, WA</span>"
         "</div>",
         unsafe_allow_html=True,
     )
     st.markdown("---")
 
 # ---------------------------------------------------------------------------
-# Onglets
+# Tabs
 # ---------------------------------------------------------------------------
-tab1, tab2 = st.tabs(["📊  Exploration du marché", "🔍  Analyse d'une propriété"])
+tab1, tab2 = st.tabs(["📊  Exploration du marché", "🔍  Analyse de propriété"])
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ONGLET 1 — Exploration du marché
+# TAB 1 — Market Exploration
 # ═══════════════════════════════════════════════════════════════════════════
 with tab1:
 
     st.markdown(
-        "<div class='info-box'>"
-        "💡 <b>Comment utiliser cet onglet :</b> Ajustez les filtres dans la barre latérale à gauche "
-        "pour cibler un segment du marché. Tous les graphiques et métriques se mettent à jour automatiquement. "
-        "En bas de page, cliquez sur le bouton doré pour obtenir un résumé IA du segment filtré."
+        "<div class='tip-card'>"
+        "💡 <b>Astuce :</b> Utilisez les filtres dans la barre latérale pour cibler un segment. "
+        "Tout se met à jour en temps réel. Descendez pour le résumé IA !"
         "</div>",
         unsafe_allow_html=True,
     )
 
-    # ── A. Filtres interactifs (sidebar) ──
+    # ── Filters (sidebar) ──
     with st.sidebar:
-        st.header("⚙️ Filtres du marché")
-        st.caption("Ajustez les filtres pour explorer un segment précis.")
+        st.header("⚙️ Filtres")
 
         min_price, max_price = int(df["price"].min()), int(df["price"].max())
         price_range = st.slider(
-            "💰 Fourchette de prix",
-            min_value=min_price, max_value=max_price,
-            value=(min_price, max_price),
-            step=10_000,
-            format="$%d",
-            help="Glissez les bornes pour filtrer par prix de vente.",
+            "💰 Prix", min_value=min_price, max_value=max_price,
+            value=(min_price, max_price), step=10_000, format="$%d",
+            help="Glissez pour filtrer par prix.",
         )
 
         bedrooms_options = sorted(df["bedrooms"].unique())
         selected_bedrooms = st.multiselect(
-            "🛏️ Nombre de chambres",
-            bedrooms_options,
-            default=bedrooms_options,
-            help="Sélectionnez un ou plusieurs nombres de chambres.",
+            "🛏️ Chambres", bedrooms_options, default=bedrooms_options,
+            help="Sélectionnez le nombre de chambres.",
         )
 
         zipcode_options = sorted(df["zipcode"].unique())
         selected_zipcodes = st.multiselect(
-            "📍 Code postal",
-            zipcode_options,
-            default=zipcode_options,
-            help="Filtrez par quartier (code postal).",
+            "📍 Code postal", zipcode_options, default=zipcode_options,
+            help="Filtrez par quartier.",
         )
 
         min_grade, max_grade = int(df["grade"].min()), int(df["grade"].max())
         grade_range = st.slider(
-            "⭐ Grade de construction",
-            min_value=min_grade, max_value=max_grade,
+            "⭐ Grade", min_value=min_grade, max_value=max_grade,
             value=(min_grade, max_grade),
-            help="1-3 = qualité faible, 7 = moyenne, 11-13 = qualité élevée.",
+            help="1-3 faible, 7 moyen, 11-13 élevé.",
         )
 
-        waterfront_only = st.checkbox(
-            "🌊 Front de mer uniquement",
-            help="Cochez pour ne voir que les propriétés en bord de mer.",
-        )
+        waterfront_only = st.checkbox("🌊 Front de mer seulement")
 
         min_year, max_year = int(df["yr_built"].min()), int(df["yr_built"].max())
         year_range = st.slider(
             "📅 Année de construction",
             min_value=min_year, max_value=max_year,
             value=(min_year, max_year),
-            help="Filtrez selon l'ancienneté des maisons.",
         )
 
         st.markdown("---")
-        st.caption("🔄 Les résultats se mettent à jour automatiquement.")
+        st.markdown(
+            "<p style='color:#64748b; font-size:0.72rem; text-align:center;'>"
+            "Les résultats se mettent à jour automatiquement</p>",
+            unsafe_allow_html=True,
+        )
 
-    # Application des filtres
+    # Apply filters
     filtered = df[
         (df["price"].between(price_range[0], price_range[1]))
         & (df["bedrooms"].isin(selected_bedrooms))
@@ -298,11 +563,11 @@ with tab1:
         filtered = filtered[filtered["waterfront"] == 1]
 
     if len(filtered) == 0:
-        st.warning("⚠️ Aucune propriété ne correspond à vos filtres. Essayez d'élargir vos critères.")
+        st.warning("Aucune propriété ne correspond. Élargissez vos filtres.")
         st.stop()
 
-    # ── B. Métriques clés (KPIs) ──
-    st.subheader("📈 Aperçu du segment")
+    # ── KPIs ──
+    st.markdown("<p class='section-label'>Aperçu du segment</p>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Propriétés", f"{len(filtered):,}")
@@ -311,96 +576,81 @@ with tab1:
     col4.metric("Prix / pi²", f"{filtered['price_per_sqft'].mean():,.0f} $")
 
     col5, col6, col7, col8 = st.columns(4)
-    col5.metric("Prix minimum", f"{filtered['price'].min():,.0f} $")
-    col6.metric("Prix maximum", f"{filtered['price'].max():,.0f} $")
+    col5.metric("Min", f"{filtered['price'].min():,.0f} $")
+    col6.metric("Max", f"{filtered['price'].max():,.0f} $")
     col7.metric("Âge moyen", f"{filtered['age'].mean():,.0f} ans")
     pct_wf_val = (filtered["waterfront"].sum() / len(filtered) * 100) if len(filtered) > 0 else 0
-    col8.metric("% Front de mer", f"{pct_wf_val:.1f}%")
+    col8.metric("Front de mer", f"{pct_wf_val:.1f}%")
 
     st.markdown("---")
 
-    # ── C. Visualisations ──
-    st.subheader("📊 Graphiques")
-    st.markdown(
-        "<div class='info-box'>"
-        "Les graphiques ci-dessous s'adaptent aux filtres que vous avez définis."
-        "</div>",
-        unsafe_allow_html=True,
-    )
+    # ── Charts ──
+    st.markdown("<p class='section-label'>Visualisations</p>", unsafe_allow_html=True)
 
     chart_col1, chart_col2 = st.columns(2)
 
-    # 1) Histogramme
     with chart_col1:
         fig1, ax1 = plt.subplots(figsize=(8, 4))
-        ax1.hist(filtered["price"], bins=50, color="#e8c547", edgecolor="#0a1628", alpha=0.9)
+        ax1.hist(filtered["price"], bins=50, color=C_PRIMARY, edgecolor="#0f172a", alpha=0.9)
         ax1.set_title("Distribution des prix", fontsize=13, fontweight="bold")
         ax1.set_xlabel("Prix ($)")
-        ax1.set_ylabel("Nombre de propriétés")
+        ax1.set_ylabel("Propriétés")
         ax1.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
         ax1.grid(True, axis="y")
         plt.tight_layout()
         st.pyplot(fig1)
-        st.caption("Répartition des prix de vente dans le segment sélectionné.")
 
-    # 2) Scatter plot
     with chart_col2:
         fig2, ax2 = plt.subplots(figsize=(8, 4))
-        scatter = ax2.scatter(
+        sc = ax2.scatter(
             filtered["sqft_living"], filtered["price"],
-            c=filtered["grade"], cmap="plasma", alpha=0.5, s=8,
+            c=filtered["grade"], cmap="cool", alpha=0.5, s=8,
         )
         ax2.set_title("Prix vs Superficie (par grade)", fontsize=13, fontweight="bold")
-        ax2.set_xlabel("Superficie habitable (pi²)")
+        ax2.set_xlabel("Superficie (pi²)")
         ax2.set_ylabel("Prix ($)")
         ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
-        cbar = plt.colorbar(scatter, ax=ax2)
-        cbar.set_label("Grade", color="#8892b0")
-        cbar.ax.yaxis.set_tick_params(color="#8892b0")
-        plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color="#8892b0")
+        cbar = plt.colorbar(sc, ax=ax2)
+        cbar.set_label("Grade", color="#94a3b8")
+        cbar.ax.yaxis.set_tick_params(color="#94a3b8")
+        plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color="#94a3b8")
         ax2.grid(True, alpha=0.3)
         plt.tight_layout()
         st.pyplot(fig2)
-        st.caption("Plus le grade est élevé (couleur claire), plus le prix tend à monter.")
 
     chart_col3, chart_col4 = st.columns(2)
 
-    # 3) Prix moyen par chambres
     with chart_col3:
         fig4, ax4 = plt.subplots(figsize=(8, 4))
         avg_by_bed = filtered.groupby("bedrooms")["price"].mean().sort_index()
-        ax4.bar(avg_by_bed.index.astype(str), avg_by_bed.values, color="#4fc3f7", edgecolor="#0a1628")
-        ax4.set_title("Prix moyen par nombre de chambres", fontsize=13, fontweight="bold")
+        ax4.bar(avg_by_bed.index.astype(str), avg_by_bed.values, color=C_ACCENT, edgecolor="#0f172a")
+        ax4.set_title("Prix moyen par chambres", fontsize=13, fontweight="bold")
         ax4.set_xlabel("Chambres")
         ax4.set_ylabel("Prix moyen ($)")
         ax4.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
         ax4.grid(True, axis="y")
         plt.tight_layout()
         st.pyplot(fig4)
-        st.caption("Le prix moyen augmente généralement avec le nombre de chambres.")
 
-    # 4) Top 10 zipcodes
     with chart_col4:
         fig6, ax6 = plt.subplots(figsize=(8, 4))
         top_zips = filtered.groupby("zipcode")["price"].mean().nlargest(10).sort_values()
-        ax6.barh(top_zips.index.astype(str), top_zips.values, color="#e8c547", edgecolor="#0a1628")
-        ax6.set_title("Top 10 des quartiers les plus chers", fontsize=13, fontweight="bold")
+        ax6.barh(top_zips.index.astype(str), top_zips.values, color=C_SECONDARY, edgecolor="#0f172a")
+        ax6.set_title("Top 10 quartiers les plus chers", fontsize=13, fontweight="bold")
         ax6.set_xlabel("Prix moyen ($)")
         ax6.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
         ax6.grid(True, axis="x")
         plt.tight_layout()
         st.pyplot(fig6)
-        st.caption("Les 10 codes postaux avec le prix moyen le plus élevé.")
 
-    # 5) Matrice de corrélation (dans un expander)
+    # Correlation matrix
     st.markdown("---")
-    with st.expander("🔬 Voir la matrice de corrélation (analyse avancée)", expanded=False):
+    with st.expander("🔬 Matrice de corrélation (avancé)"):
         st.markdown(
-            "<div class='info-box'>"
-            "La matrice montre comment les variables sont liées entre elles. "
-            "Un coefficient proche de <b>+1</b> = forte relation positive, "
-            "proche de <b>-1</b> = relation inverse, "
-            "proche de <b>0</b> = pas de relation."
+            "<div class='tip-card'>"
+            "<b>+1</b> = forte relation positive &nbsp; | &nbsp; "
+            "<b>-1</b> = relation inverse &nbsp; | &nbsp; "
+            "<b>0</b> = aucune relation"
             "</div>",
             unsafe_allow_html=True,
         )
@@ -412,40 +662,26 @@ with tab1:
         ]
         corr = filtered[corr_cols].corr()
         sns.heatmap(
-            corr, annot=True, fmt=".2f", cmap="YlOrBr", ax=ax3,
-            square=True, linewidths=0.5, linecolor="#1e3a5f",
+            corr, annot=True, fmt=".2f", cmap="RdYlBu_r", ax=ax3,
+            square=True, linewidths=0.5, linecolor="#334155",
             cbar_kws={"shrink": 0.8},
         )
         ax3.set_title("Matrice de corrélation", fontsize=14, fontweight="bold", pad=15)
         plt.tight_layout()
         st.pyplot(fig3)
 
-    # 6) Carte interactive
+    # Map
     st.markdown("---")
-    st.subheader("🗺️ Localisation des propriétés")
-    st.markdown(
-        "<div class='info-box'>"
-        "Chaque point représente une propriété du segment filtré. "
-        "Zoomez pour explorer les quartiers."
-        "</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<p class='section-label'>Carte des propriétés</p>", unsafe_allow_html=True)
     map_data = filtered[["lat", "long"]].rename(columns={"long": "lon"})
     st.map(map_data, zoom=9)
 
-    # ── D. Résumé LLM ──
+    # ── LLM Summary ──
     st.markdown("---")
-    st.subheader("🤖 Résumé IA du marché")
-    st.markdown(
-        "<div class='info-box'>"
-        "Cliquez sur le bouton ci-dessous pour demander à l'intelligence artificielle "
-        "d'analyser le segment filtré et de rédiger un résumé professionnel."
-        "</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("<p class='section-label'>Intelligence artificielle</p>", unsafe_allow_html=True)
 
-    if st.button("✨ Générer un résumé du marché", key="btn_resume", use_container_width=True):
-        with st.spinner("L'IA rédige le résumé... cela prend quelques secondes."):
+    if st.button("🤖  Générer un résumé IA du marché", key="btn_resume", use_container_width=True):
+        with st.spinner("Gemini analyse le marché..."):
             n = len(filtered)
             mean_price = filtered["price"].mean()
             median_price = filtered["price"].median()
@@ -467,116 +703,85 @@ with tab1:
 Rédige un résumé exécutif de ce segment en 3-4 paragraphes. Identifie les tendances clés et les opportunités d'investissement."""
 
             response = client.models.generate_content(model=LLM_MODEL, contents=prompt)
-            st.markdown(
-                f"<div class='section-card'>{response.text}</div>",
-                unsafe_allow_html=True,
-            )
+            st.markdown(f"<div class='ai-response'>{response.text}</div>", unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ONGLET 2 — Analyse d'une propriété
+# TAB 2 — Property Analysis
 # ═══════════════════════════════════════════════════════════════════════════
 with tab2:
 
     st.markdown(
-        "<div class='info-box'>"
-        "💡 <b>Comment utiliser cet onglet :</b> "
-        "① Choisissez un code postal → "
-        "② Sélectionnez le nombre de chambres → "
-        "③ Choisissez une propriété dans la liste. "
-        "L'app trouvera automatiquement des propriétés comparables et vous permettra "
-        "d'obtenir une recommandation IA."
+        "<div class='tip-card'>"
+        "💡 Choisissez un quartier, puis une propriété. L'app trouve automatiquement "
+        "les comparables et vous donne un verdict IA."
         "</div>",
         unsafe_allow_html=True,
     )
 
-    # ── A. Sélection de la propriété ──
-    st.subheader("🔎 Étape 1 — Choisir une propriété")
+    # ── Selection ──
+    st.markdown(
+        "<p class='section-label'><span class='step-badge'>1</span> Sélection</p>",
+        unsafe_allow_html=True,
+    )
 
     sel_col1, sel_col2, sel_col3 = st.columns(3)
     with sel_col1:
-        zip_filter = st.selectbox(
-            "📍 Code postal",
-            sorted(df["zipcode"].unique()),
-            key="tab2_zip",
-            help="Choisissez le quartier à analyser.",
-        )
+        zip_filter = st.selectbox("📍 Quartier", sorted(df["zipcode"].unique()), key="tab2_zip")
     with sel_col2:
         beds_in_zip = sorted(df[df["zipcode"] == zip_filter]["bedrooms"].unique())
-        bed_filter = st.selectbox(
-            "🛏️ Chambres",
-            beds_in_zip,
-            key="tab2_bed",
-            help="Filtrez par nombre de chambres dans ce quartier.",
-        )
+        bed_filter = st.selectbox("🛏️ Chambres", beds_in_zip, key="tab2_bed")
     with sel_col3:
         subset = df[(df["zipcode"] == zip_filter) & (df["bedrooms"] == bed_filter)]
         options = subset.apply(lambda r: f"ID {r['id']} — {r['price']:,.0f} $", axis=1)
-
         if len(subset) == 0:
             st.warning("Aucune propriété trouvée.")
             st.stop()
-
-        selected_label = st.selectbox(
-            "🏠 Propriété",
-            options.values,
-            key="tab2_prop",
-            help="Sélectionnez la maison à analyser.",
-        )
+        selected_label = st.selectbox("🏠 Propriété", options.values, key="tab2_prop")
 
     selected_idx = options[options == selected_label].index[0]
     prop = df.loc[selected_idx]
 
     st.markdown("---")
 
-    # ── B. Fiche descriptive ──
-    st.subheader("🏡 Étape 2 — Fiche de la propriété")
+    # ── Property Card ──
+    st.markdown(
+        "<p class='section-label'><span class='step-badge'>2</span> Fiche de la propriété</p>",
+        unsafe_allow_html=True,
+    )
 
-    # Caractéristiques principales
-    st.markdown("**Caractéristiques principales**")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Prix", f"{prop['price']:,.0f} $")
     c2.metric("Chambres", int(prop["bedrooms"]))
     c3.metric("Salles de bain", prop["bathrooms"])
     c4.metric("Superficie", f"{int(prop['sqft_living']):,} pi²")
 
-    # Qualité & état
-    st.markdown("**Qualité & état**")
     c5, c6, c7, c8 = st.columns(4)
     c5.metric("Terrain", f"{int(prop['sqft_lot']):,} pi²")
     c6.metric("Grade", f"{int(prop['grade'])}/13")
     c7.metric("Condition", f"{int(prop['condition'])}/5")
-    c8.metric("Année", int(prop["yr_built"]))
+    c8.metric("Construite", int(prop["yr_built"]))
 
-    # Extras
-    st.markdown("**Informations supplémentaires**")
     c9, c10, c11, c12 = st.columns(4)
     c9.metric("Étages", prop["floors"])
     c10.metric("Vue", f"{int(prop['view'])}/4")
-    c11.metric("Front de mer", "Oui" if prop["waterfront"] else "Non")
+    c11.metric("Bord de mer", "Oui" if prop["waterfront"] else "Non")
     c12.metric("Rénovée", str(int(prop["yr_renovated"])) if prop["yr_renovated"] > 0 else "Non")
 
-    # Localisation
-    st.markdown("**Localisation**")
     st.map(pd.DataFrame({"lat": [prop["lat"]], "lon": [prop["long"]]}), zoom=13)
 
     st.markdown("---")
 
-    # ── C. Recherche de comparables ──
-    st.subheader("⚖️ Étape 3 — Propriétés comparables")
+    # ── Comparables ──
     st.markdown(
-        "<div class='info-box'>"
-        "L'application recherche des maisons similaires (même quartier, taille proche, "
-        "nombre de chambres similaire). Si peu de résultats sont trouvés, les critères "
-        "sont automatiquement élargis."
-        "</div>",
+        "<p class='section-label'><span class='step-badge'>3</span> Comparables</p>",
         unsafe_allow_html=True,
     )
 
     search_levels = [
-        {"label": "Même quartier, même chambres, superficie ±20%", "zip_same": True, "bed_tol": 0, "sqft_tol": 0.20},
-        {"label": "Même quartier, chambres ±1, superficie ±30%", "zip_same": True, "bed_tol": 1, "sqft_tol": 0.30},
-        {"label": "Même quartier, chambres ±2, superficie ±50%", "zip_same": True, "bed_tol": 2, "sqft_tol": 0.50},
-        {"label": "Tous les quartiers, chambres ±1, superficie ±30%", "zip_same": False, "bed_tol": 1, "sqft_tol": 0.30},
+        {"label": "Même quartier, même chambres, ±20%", "zip_same": True, "bed_tol": 0, "sqft_tol": 0.20},
+        {"label": "Même quartier, chambres ±1, ±30%", "zip_same": True, "bed_tol": 1, "sqft_tol": 0.30},
+        {"label": "Même quartier, chambres ±2, ±50%", "zip_same": True, "bed_tol": 2, "sqft_tol": 0.50},
+        {"label": "Tous quartiers, chambres ±1, ±30%", "zip_same": False, "bed_tol": 1, "sqft_tol": 0.30},
     ]
 
     comps = pd.DataFrame()
@@ -586,7 +791,6 @@ with tab2:
         sqft_high = prop["sqft_living"] * (1 + level["sqft_tol"])
         bed_low = prop["bedrooms"] - level["bed_tol"]
         bed_high = prop["bedrooms"] + level["bed_tol"]
-
         mask = (
             (df["bedrooms"].between(bed_low, bed_high))
             & (df["sqft_living"].between(sqft_low, sqft_high))
@@ -594,23 +798,22 @@ with tab2:
         )
         if level["zip_same"]:
             mask = mask & (df["zipcode"] == prop["zipcode"])
-
         comps = df[mask]
         if len(comps) >= 3:
             used_level = level
             break
 
     if len(comps) == 0:
-        st.warning("Aucun comparable trouvé, même avec des critères élargis. Essayez une autre propriété.")
+        st.warning("Aucun comparable trouvé. Essayez une autre propriété.")
     else:
         if used_level and used_level != search_levels[0]:
             st.markdown(
-                f"<div class='warning-box'>🔄 Critères élargis automatiquement : <b>{used_level['label']}</b></div>",
+                f"<div class='warn-card'>🔄 Critères élargis : <b>{used_level['label']}</b></div>",
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                f"<div class='success-box'>✅ {len(comps)} comparables trouvés avec les critères stricts.</div>",
+                f"<div class='success-card'>✅ <b>{len(comps)}</b> comparables trouvés (critères stricts)</div>",
                 unsafe_allow_html=True,
             )
 
@@ -622,8 +825,8 @@ with tab2:
         surcote_decote = "SURCOTE" if ecart > 0 else "DÉCOTE"
 
         mc1, mc2, mc3 = st.columns(3)
-        mc1.metric("Comparables trouvés", n_comps)
-        mc2.metric("Prix moyen comparables", f"{mean_comp_price:,.0f} $")
+        mc1.metric("Comparables", n_comps)
+        mc2.metric("Prix moy. comps", f"{mean_comp_price:,.0f} $")
         mc3.metric(
             f"Écart ({surcote_decote})",
             f"{ecart:+,.0f} $",
@@ -631,67 +834,62 @@ with tab2:
             delta_color="inverse",
         )
 
-        if surcote_decote == "SURCOTE":
+        if ecart > 0:
             st.markdown(
-                f"<div class='warning-box'>⚠️ Cette propriété est en <b>surcote de {abs(ecart_pct):.1f}%</b> "
-                f"par rapport aux comparables — elle est plus chère que la moyenne du marché local.</div>",
+                f"<div class='warn-card'>⚠️ <b>Surcote de {abs(ecart_pct):.1f}%</b> — "
+                f"plus chère que le marché local</div>",
                 unsafe_allow_html=True,
             )
         else:
             st.markdown(
-                f"<div class='success-box'>💰 Cette propriété est en <b>décote de {abs(ecart_pct):.1f}%</b> "
-                f"par rapport aux comparables — potentielle bonne affaire!</div>",
+                f"<div class='success-card'>💰 <b>Décote de {abs(ecart_pct):.1f}%</b> — "
+                f"potentielle bonne affaire !</div>",
                 unsafe_allow_html=True,
             )
 
         display_cols = ["id", "price", "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "grade", "condition", "yr_built"]
         st.dataframe(
             comps_display[display_cols].style.format({
-                "price": "${:,.0f}",
-                "sqft_living": "{:,.0f}",
-                "sqft_lot": "{:,.0f}",
+                "price": "${:,.0f}", "sqft_living": "{:,.0f}", "sqft_lot": "{:,.0f}",
             }),
             use_container_width=True,
         )
 
         st.markdown("---")
 
-        # ── D. Visualisations comparatives ──
-        st.subheader("📊 Étape 4 — Comparaison visuelle")
+        # ── Charts ──
+        st.markdown(
+            "<p class='section-label'><span class='step-badge'>4</span> Comparaison visuelle</p>",
+            unsafe_allow_html=True,
+        )
 
         viz_col1, viz_col2 = st.columns(2)
 
-        # Barres : prix
         with viz_col1:
             fig5, ax5 = plt.subplots(figsize=(8, 5))
             comp_ids = comps_display["id"].astype(str).tolist()
             comp_prices = comps_display["price"].tolist()
-
             all_ids = comp_ids + [str(int(prop["id"]))]
             all_prices = comp_prices + [prop["price"]]
-            colors = ["#4fc3f7"] * len(comp_ids) + ["#e8c547"]
+            colors = [C_ACCENT] * len(comp_ids) + [C_PRIMARY]
 
-            ax5.bar(range(len(all_ids)), all_prices, color=colors, edgecolor="#0a1628")
+            ax5.bar(range(len(all_ids)), all_prices, color=colors, edgecolor="#0f172a", width=0.7)
             ax5.set_xticks(range(len(all_ids)))
             ax5.set_xticklabels(all_ids, rotation=45, ha="right", fontsize=7)
             ax5.set_title("Prix : Sélectionnée vs Comparables", fontsize=13, fontweight="bold")
-            ax5.set_xlabel("ID de la propriété")
             ax5.set_ylabel("Prix ($)")
             ax5.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
             ax5.grid(True, axis="y")
-
             ax5.annotate(
                 "★ Sélectionnée",
                 xy=(len(all_ids) - 1, prop["price"]),
                 xytext=(len(all_ids) - 1, prop["price"] * 1.10),
-                ha="center", fontsize=9, fontweight="bold", color="#e8c547",
-                arrowprops=dict(arrowstyle="->", color="#e8c547"),
+                ha="center", fontsize=9, fontweight="bold", color=C_PRIMARY,
+                arrowprops=dict(arrowstyle="->", color=C_PRIMARY, lw=2),
             )
             plt.tight_layout()
             st.pyplot(fig5)
-            st.caption("🟡 Doré = propriété sélectionnée | 🔵 Bleu = comparables")
 
-        # Radar
         with viz_col2:
             categories = ["Prix/pi²", "Grade", "Condition", "Vue", "Superficie"]
             max_price_sqft = df["price_per_sqft"].max()
@@ -701,14 +899,14 @@ with tab2:
                 prop["price_per_sqft"] / max_price_sqft,
                 prop["grade"] / 13,
                 prop["condition"] / 5,
-                prop["view"] / 4 if prop["view"] > 0 else 0.05,
+                max(prop["view"] / 4, 0.05),
                 prop["sqft_living"] / max_sqft,
             ]
             comp_values = [
                 comps["price_per_sqft"].mean() / max_price_sqft,
                 comps["grade"].mean() / 13,
                 comps["condition"].mean() / 5,
-                comps["view"].mean() / 4 if comps["view"].mean() > 0 else 0.05,
+                max(comps["view"].mean() / 4, 0.05),
                 comps["sqft_living"].mean() / max_sqft,
             ]
 
@@ -718,42 +916,36 @@ with tab2:
             angles += angles[:1]
 
             fig7, ax7 = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
-            ax7.set_facecolor("#0a1628")
-            fig7.set_facecolor("#112240")
+            ax7.set_facecolor("#0f172a")
+            fig7.set_facecolor("#1e293b")
 
-            ax7.fill(angles, prop_values, color="#e8c547", alpha=0.25)
-            ax7.plot(angles, prop_values, color="#e8c547", linewidth=2, label="Sélectionnée")
+            ax7.fill(angles, prop_values, color=C_PRIMARY, alpha=0.25)
+            ax7.plot(angles, prop_values, color=C_PRIMARY, linewidth=2.5, label="Sélectionnée")
 
-            ax7.fill(angles, comp_values, color="#4fc3f7", alpha=0.15)
-            ax7.plot(angles, comp_values, color="#4fc3f7", linewidth=2, label="Moy. comparables")
+            ax7.fill(angles, comp_values, color=C_ACCENT, alpha=0.15)
+            ax7.plot(angles, comp_values, color=C_ACCENT, linewidth=2.5, label="Moy. comparables")
 
             ax7.set_xticks(angles[:-1])
-            ax7.set_xticklabels(categories, fontsize=9, color="#ccd6f6")
+            ax7.set_xticklabels(categories, fontsize=9, color="#e2e8f0")
             ax7.set_yticklabels([])
-            ax7.set_title("Radar comparatif", fontsize=13, fontweight="bold", color="#ccd6f6", pad=20)
-            ax7.legend(loc="upper right", bbox_to_anchor=(1.35, 1.15), fontsize=9,
-                       facecolor="#112240", edgecolor="#1e3a5f", labelcolor="#ccd6f6")
-            ax7.spines["polar"].set_color("#1e3a5f")
-            ax7.grid(color="#1e3a5f")
+            ax7.set_title("Radar comparatif", fontsize=13, fontweight="bold", color="#e2e8f0", pad=20)
+            ax7.legend(loc="upper right", bbox_to_anchor=(1.4, 1.15), fontsize=9,
+                       facecolor="#1e293b", edgecolor="#334155", labelcolor="#e2e8f0")
+            ax7.spines["polar"].set_color("#334155")
+            ax7.grid(color="#334155")
             plt.tight_layout()
             st.pyplot(fig7)
-            st.caption("Compare visuellement la propriété sélectionnée (doré) à la moyenne des comparables (bleu).")
 
         st.markdown("---")
 
-        # ── E. Recommandation LLM ──
-        st.subheader("🤖 Étape 5 — Recommandation IA")
+        # ── LLM Recommendation ──
         st.markdown(
-            "<div class='info-box'>"
-            "L'intelligence artificielle va analyser la propriété sélectionnée, "
-            "la comparer aux propriétés similaires et émettre un verdict : "
-            "<b>Acheter</b>, <b>À surveiller</b> ou <b>Éviter</b>."
-            "</div>",
+            "<p class='section-label'><span class='step-badge'>5</span> Verdict IA</p>",
             unsafe_allow_html=True,
         )
 
-        if st.button("✨ Générer une recommandation", key="btn_reco", use_container_width=True):
-            with st.spinner("L'IA analyse la propriété... cela prend quelques secondes."):
+        if st.button("🤖  Obtenir la recommandation IA", key="btn_reco", use_container_width=True):
+            with st.spinner("Gemini analyse la propriété..."):
                 renovated = str(int(prop["yr_renovated"])) if prop["yr_renovated"] > 0 else "Non"
                 waterfront_str = "Oui" if prop["waterfront"] else "Non"
 
@@ -776,19 +968,20 @@ ANALYSE COMPARATIVE :
 Rédige une recommandation d'investissement en 3-4 paragraphes. Inclus : évaluation du prix, forces et faiblesses, verdict final (Acheter / À surveiller / Éviter) avec justification."""
 
                 response_reco = client.models.generate_content(model=LLM_MODEL, contents=prompt_reco)
-                st.markdown(
-                    f"<div class='section-card'>{response_reco.text}</div>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown(f"<div class='ai-response'>{response_reco.text}</div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 # Footer
 # ---------------------------------------------------------------------------
 st.markdown("---")
 st.markdown(
-    "<p style='text-align:center; color:#4a5568; font-size:0.8rem;'>"
-    "Analyseur Immobilier — King County | Données : kc_house_data.csv | "
-    "Propulsé par Streamlit & Google Gemini"
-    "</p>",
+    "<div style='text-align:center; padding:20px 0;'>"
+    "<span style='font-family:Space Grotesk,sans-serif; color:#475569; font-size:0.85rem; font-weight:600;'>"
+    "HomeScope AI</span>"
+    "<span style='color:#334155; font-size:0.85rem;'> &nbsp;|&nbsp; </span>"
+    "<span style='color:#64748b; font-size:0.75rem;'>"
+    "Streamlit &bull; Pandas &bull; Matplotlib &bull; Google Gemini"
+    "</span>"
+    "</div>",
     unsafe_allow_html=True,
 )
